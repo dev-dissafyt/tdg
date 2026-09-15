@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #F8F9FA;
+    --foreground: #0D0F11;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* 9-Box Canvas Grid Lines */
+.bmc-grid-box {
+  background: #FFFFFF;
+  border: 1px solid #E2E5E9;
+  transition: all 0.15s ease;
+}
+
+.bmc-grid-box:hover {
+  border-color: #2563EB;
+}

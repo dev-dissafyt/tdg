@@ -1,0 +1,417 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  GUEST
+  APPLICANT
+  INCUBATEE
+  STUDENT_CODER
+  STUDENT_3D
+  DEPARTMENT_STAFF
+  SUPER_ADMIN
+}
+
+enum DepartmentType {
+  GENERAL
+  COWORKING
+  INCUBATION
+  CODETREPRENEURS
+  MAKER_3D
+}
+
+enum ApplicationStage {
+  SUBMITTED
+  IN_REVIEW
+  INTERVIEW_SCHEDULED
+  ACCEPTED
+  REJECTED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_USER
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum CohortTrack {
+  CODETREPRENEURS
+  MAKER_3D
+}
+
+enum CohortStatus {
+  COMPLETED
+  ACTIVE
+  UPCOMING
+}
+
+enum ZoneStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum BmcBlockType {
+  KEY_PARTNERS
+  KEY_ACTIVITIES
+  VALUE_PROPOSITIONS
+  CUSTOMER_RELATIONSHIPS
+  CUSTOMER_SEGMENTS
+  KEY_RESOURCES
+  CHANNELS
+  COST_STRUCTURE
+  REVENUE_STREAMS
+}
+
+enum ComplianceDocType {
+  CIPC_REGISTRATION
+  BBBEE_AFFIDAVIT
+  TAX_PIN_SARS
+  BANK_CONFIRMATION
+  FOUNDER_AGREEMENT
+  INVESTOR_PITCH_DECK
+}
+
+enum ComplianceStatus {
+  VERIFIED
+  PENDING_REVIEW
+  EXPIRED
+  MISSING
+}
+
+// ----------------------------------------------------
+// AUTH & USERS
+// ----------------------------------------------------
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String       @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role         @default(APPLICANT)
+  phone         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  profile       Profile?
+  applications  Application[]
+  assignedTickets Ticket[]   @relation("TicketAssignee")
+  submittedTickets Ticket[]  @relation("TicketSubmitter")
+  ticketMessages  TicketMessage[]
+  businessProfiles BusinessProfile[]
+  cohortMembers CohortMember[]
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String?
+  suburb    String?  @default("Kraaifontein")
+  githubUrl String?
+  linkedinUrl String?
+  cvUrl     String?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ----------------------------------------------------
+// DEPARTMENTS & TRIAGE
+// ----------------------------------------------------
+
+model Department {
+  id          String         @id @default(cuid())
+  slug        String         @unique
+  name        String
+  type        DepartmentType @default(GENERAL)
+  leadUserId  String?
+  description String?
+  teamMembers TeamMember[]
+  tickets     Ticket[]
+}
+
+model Ticket {
+  id              String         @id @default(cuid())
+  ticketNumber    String         @unique
+  subject         String
+  description     String         @db.Text
+  departmentType  DepartmentType @default(GENERAL)
+  departmentId    String?
+  department      Department?    @relation(fields: [departmentId], references: [id])
+  status          TicketStatus   @default(OPEN)
+  priority        TicketPriority @default(NORMAL)
+  
+  submittedByUserId String?
+  submittedByUser   User?        @relation("TicketSubmitter", fields: [submittedByUserId], references: [id])
+  submittedByName   String
+  submittedByEmail  String
+  submittedByPhone  String?
+
+  assignedToUserId  String?
+  assignedToUser    User?        @relation("TicketAssignee", fields: [assignedToUserId], references: [id])
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  messages        TicketMessage[]
+}
+
+model TicketMessage {
+  id             String             @id @default(cuid())
+  ticketId       String
+  ticket         Ticket             @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User               @relation(fields: [senderId], references: [id])
+  isInternalNote Boolean            @default(false)
+  content        String             @db.Text
+  createdAt      DateTime           @default(now())
+  attachments    TicketAttachment[]
+}
+
+model TicketAttachment {
+  id        String        @id @default(cuid())
+  messageId String
+  message   TicketMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  filename  String
+  fileUrl   String
+  fileSize  Int?
+}
+
+// ----------------------------------------------------
+// COHORTS & ADMISSIONS
+// ----------------------------------------------------
+
+model Cohort {
+  id           String         @id @default(cuid())
+  year         String
+  track        CohortTrack
+  title        String
+  summary      String         @db.Text
+  startDate    DateTime
+  endDate      DateTime
+  status       CohortStatus   @default(ACTIVE)
+  members      CohortMember[]
+  capstones    ProjectShowcase[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model CohortMember {
+  id                 String       @id @default(cuid())
+  cohortId           String
+  cohort             Cohort       @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+  userId             String?
+  user               User?        @relation(fields: [userId], references: [id])
+  name               String
+  suburb             String       @default("Scottsville, Kraaifontein")
+  track              CohortTrack
+  bio                String       @db.Text
+  avatarUrl          String
+  capstoneTitle      String
+  employedOrLaunched Boolean      @default(false)
+  linkedinUrl        String?
+  githubUrl          String?
+}
+
+model ProjectShowcase {
+  id           String       @id @default(cuid())
+  cohortId     String
+  cohort       Cohort       @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+  title        String
+  tagline      String
+  description  String       @db.Text
+  creators     String[]
+  thumbnailUrl String
+  demoUrl      String?
+  repoUrl      String?
+  cadFileUrl   String?
+  tags         String[]
+  featured     Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+}
+
+model Application {
+  id                   String           @id @default(cuid())
+  userId               String?
+  user                 User?            @relation(fields: [userId], references: [id])
+  fullName             String
+  email                String
+  phone                String
+  suburb               String           @default("Kraaifontein")
+  track                DepartmentType
+  stage                ApplicationStage @default(SUBMITTED)
+  motivation           String           @db.Text
+  educationLevel       String?
+  priorExperience      String?          @db.Text
+  githubOrPortfolioUrl String?
+  businessConcept      String?          @db.Text
+  pitchDeckUrl         String?
+  deskTypePreference   String?
+  interviewDate        DateTime?
+  submittedAt          DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  stageHistory         ApplicationStageHistory[]
+}
+
+model ApplicationStageHistory {
+  id            String           @id @default(cuid())
+  applicationId String
+  application   Application      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  stage         ApplicationStage
+  notes         String?
+  updatedBy     String?
+  timestamp     DateTime         @default(now())
+}
+
+// ----------------------------------------------------
+// CMS: TEAM & COWORKING SPACES
+// ----------------------------------------------------
+
+model TeamMember {
+  id           String      @id @default(cuid())
+  name         String
+  role         String
+  bio          String      @db.Text
+  avatarUrl    String
+  order        Int         @default(0)
+  email        String
+  linkedin     String?
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+}
+
+model CoworkZone {
+  id             String     @id @default(cuid())
+  slug           String     @unique
+  name           String
+  floor          Int        @default(1)
+  capacity       Int
+  svgCoordinates String     @db.Text
+  colorToken     String     @default("#2563EB")
+  status         ZoneStatus @default(AVAILABLE)
+  amenities      String[]
+  hourlyRateZar  Float
+  dailyRateZar   Float
+  monthlyRateZar Float
+  powerOutlets   Int        @default(4)
+  hasBackboneWifi Boolean   @default(true)
+  hasAvDisplay   Boolean    @default(false)
+  ergonomicChairs Int       @default(4)
+  naturalLight   Boolean    @default(true)
+  description    String     @db.Text
+  photoGallery   String[]
+}
+
+// ----------------------------------------------------
+// INCUBATOR BMS (BUSINESS MANAGEMENT SYSTEM)
+// ----------------------------------------------------
+
+model BusinessProfile {
+  id              String                    @id @default(cuid())
+  businessSlug    String                    @unique
+  businessName    String
+  tagline         String
+  founderId       String
+  founder         User                      @relation(fields: [founderId], references: [id])
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  canvasBlocks    BmcCanvasBlock[]
+  milestones      BmsMilestone[]
+  projections     BmsFinancialProjection?
+  complianceDocs  BmsComplianceDocument[]
+}
+
+model BmcCanvasBlock {
+  id          String          @id @default(cuid())
+  businessId  String
+  business    BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  blockType   BmcBlockType
+  title       String
+  notes       String          @db.Text
+  color       String?         @default("#2563EB")
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+}
+
+model BmsMilestone {
+  id                  String          @id @default(cuid())
+  businessId          String
+  business            BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  weekRange           String
+  phaseTitle          String
+  objectives          String[]
+  completed           Boolean         @default(false)
+  notes               String?         @db.Text
+  deliverableSubmitted String?
+  mentorApproved      Boolean         @default(false)
+}
+
+model BmsFinancialProjection {
+  id                        String          @id @default(cuid())
+  businessId                String          @unique
+  business                  BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  cashOnHandZar             Float           @default(50000)
+  monthlyBurnZar            Float           @default(12000)
+  runwayMonths              Float           @default(4.1)
+  monthlyRecurringRevenueZar Float          @default(8500)
+  customerAcquisitionCostZar Float          @default(450)
+  totalCustomers            Int             @default(18)
+  teamSize                  Int             @default(2)
+  updatedAt                 DateTime        @updatedAt
+}
+
+model BmsComplianceDocument {
+  id          String            @id @default(cuid())
+  businessId  String
+  business    BusinessProfile   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  title       String
+  type        ComplianceDocType
+  status      ComplianceStatus  @default(PENDING_REVIEW)
+  filename    String?
+  fileUrl     String?
+  fileSize    String?
+  uploadedAt  DateTime?
+  expiryDate  DateTime?
+}

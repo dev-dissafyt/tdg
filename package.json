@@ -1,0 +1,24 @@
+{
+  "name": "tdgh-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Daily Grind Innovation Hub (TDGH) — Master Enterprise Monorepo",
+  "packageManager": "pnpm@10.15.1",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@tdgh/web",
+    "dev:admin": "turbo run dev --filter=@tdgh/admin",
+    "dev:bms": "turbo run dev --filter=@tdgh/bms",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
