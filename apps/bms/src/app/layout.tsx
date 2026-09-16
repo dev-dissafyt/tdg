@@ -23,6 +23,7 @@ import {
   Maximize2,
   Sparkles,
   TrendingUp,
+  User,
 } from 'lucide-react';
 import { Badge, Button } from '@tdgh/ui';
 
@@ -199,23 +200,54 @@ export default function BmsRootLayout({
               })}
             </nav>
 
-            {/* Sidebar Footer: Export Deck / PDF & Main Hub Link */}
-            <div className="p-3 border-t border-porcelain-border bg-porcelain/40 space-y-2 shrink-0">
+            {/* Sidebar Footer: Incubatee Personnel, Export Deck / PDF & Main Hub Link */}
+            <div className="p-3 border-t border-porcelain-border bg-porcelain/40 space-y-2.5 shrink-0">
+              {/* Founder & Mentee/Mentor Personnel Card */}
+              {!isCollapsed ? (
+                <div className="p-2.5 rounded-xl bg-white border border-porcelain-border shadow-xs space-y-1.5">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <span className="text-xs font-bold text-obsidian truncate">
+                      KasiPay Technologies
+                    </span>
+                    <Badge variant="purple" className="text-[9px] px-1.5 py-0 shrink-0">
+                      Sprint #3
+                    </Badge>
+                  </div>
+                  <div className="text-[11px] font-mono space-y-1 pt-1 border-t border-porcelain-border">
+                    <div className="flex items-center justify-between">
+                      <span className="text-obsidian-400">Founder:</span>
+                      <span className="font-semibold text-obsidian">Sipho Ndlovu</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-obsidian-400">Mentor:</span>
+                      <span className="font-semibold text-purple-700">Tariq Johnson</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  title="KasiPay Technologies • Founder: Sipho Ndlovu • Mentor: Tariq Johnson (Sprint #3)"
+                  className="w-10 h-10 mx-auto rounded-xl bg-white border border-porcelain-border shadow-xs flex items-center justify-center cursor-default text-purple-700 font-mono font-bold text-xs"
+                >
+                  <User className="w-4 h-4 text-purple-700" />
+                </div>
+              )}
+
               {/* Export Deck / PDF Button */}
               {isCollapsed ? (
                 <button
                   onClick={() => alert('Exporting 12-Slide Investor Summary & Canvas to PDF...')}
                   title="Export 12-Slide Deck / PDF"
-                  className="w-full h-11 flex items-center justify-center rounded-xl bg-obsidian text-white hover:bg-purple-700 transition-colors shadow-tactile"
+                  className="w-full h-10 flex items-center justify-center rounded-xl bg-obsidian text-white hover:bg-purple-700 transition-colors shadow-tactile"
                 >
                   <Download className="w-4 h-4" />
                 </button>
               ) : (
                 <button
                   onClick={() => alert('Exporting 12-Slide Investor Summary & Canvas to PDF...')}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-obsidian text-white text-xs font-mono font-semibold hover:bg-purple-700 transition-colors shadow-tactile"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-obsidian text-white text-xs font-mono font-semibold hover:bg-purple-700 transition-colors shadow-tactile"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="w-3.5 h-3.5" />
                   <span>Export Deck / PDF</span>
                 </button>
               )}
@@ -226,7 +258,7 @@ export default function BmsRootLayout({
                 target="_blank"
                 rel="noreferrer"
                 title="Return to Public Hub Site"
-                className={`flex items-center text-xs font-mono text-obsidian-500 hover:text-obsidian transition-colors rounded-lg py-1.5 ${
+                className={`flex items-center text-xs font-mono text-obsidian-500 hover:text-obsidian transition-colors rounded-lg py-1 ${
                   isCollapsed ? 'justify-center px-1' : 'justify-between px-2'
                 }`}
               >
@@ -246,7 +278,7 @@ export default function BmsRootLayout({
           }`}
         >
           {/* ======================================================================= */}
-          {/* 3. SIMPLIFIED TOP HEADER (With Right-Aligned Incubatee Info) */}
+          {/* 3. SIMPLIFIED TOP HEADER (With Company Logo Only on Right) */}
           {/* ======================================================================= */}
           <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-porcelain-border h-18 px-4 sm:px-8 flex items-center justify-between shadow-xs">
             {/* Left: Mobile Drawer Trigger + Active Module Breadcrumb */}
@@ -270,23 +302,12 @@ export default function BmsRootLayout({
               </div>
             </div>
 
-            {/* Right: Incubatee Venture Information (Clean & Prominent) */}
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <span className="font-black text-sm sm:text-base text-obsidian tracking-tight">
-                    KasiPay Technologies (Pty) Ltd
-                  </span>
-                  <Badge variant="purple" className="shrink-0 text-[10px] py-0.5">
-                    Sprint #3
-                  </Badge>
-                </div>
-                <div className="text-[11px] font-mono text-obsidian-500 hidden md:block">
-                  Founder: Sipho Ndlovu &bull; Mentor: Tariq Johnson
-                </div>
-              </div>
-
-              <div className="w-9 h-9 rounded-xl bg-purple-700 text-white flex items-center justify-center font-mono font-black text-sm shadow-tactile shrink-0">
+            {/* Right: Company Logo Only */}
+            <div className="flex items-center">
+              <div
+                className="w-10 h-10 rounded-xl bg-purple-700 text-white flex items-center justify-center font-mono font-black text-base shadow-tactile hover:bg-purple-800 transition-colors cursor-pointer"
+                title="KasiPay Technologies (Pty) Ltd"
+              >
                 KP
               </div>
             </div>
