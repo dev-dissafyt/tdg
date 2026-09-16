@@ -33,7 +33,8 @@ export type ApplicationStage =
   | 'IN_REVIEW'
   | 'INTERVIEW_SCHEDULED'
   | 'ACCEPTED'
-  | 'REJECTED';
+  | 'REJECTED'
+  | 'WAITLISTED';
 
 export interface ApplicationScore {
   motivation: number; // 1-10
@@ -42,6 +43,26 @@ export interface ApplicationScore {
   notes: string;
   reviewerId: string;
   updatedAt: string;
+}
+
+export interface ApplicationVerification {
+  idDocumentVerified: boolean;
+  proofOfAddressVerified: boolean;
+  academicRecordVerified: boolean;
+  complianceOrPitchVerified: boolean;
+  verifiedByStaffId?: string;
+  verifiedAt?: string;
+  auditNotes?: string;
+}
+
+export interface IntakeWindow {
+  track: ProgramTrack;
+  title: string;
+  isOpen: boolean;
+  nextOpenDate?: string;
+  deadlineDate?: string;
+  capacityLimit: number;
+  statusNotice: string;
 }
 
 export interface Application {
@@ -66,6 +87,9 @@ export interface Application {
   };
   scores?: ApplicationScore[];
   interviewDate?: string;
+  assignedMentorId?: string;
+  assignedMentorName?: string;
+  verificationStatus?: ApplicationVerification;
 }
 
 export type TicketDepartment =

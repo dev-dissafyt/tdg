@@ -5,9 +5,19 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { tdghDb } from '@tdgh/db';
-import { Application, ProgramTrack } from '@tdgh/types';
+import { Application, ProgramTrack, IntakeWindow } from '@tdgh/types';
 import { Badge, Button, Input, Textarea } from '@tdgh/ui';
-import { ArrowLeft, CheckCircle, Clock, Upload, ArrowRight, ShieldCheck, FileText } from 'lucide-react';
+import {
+  ArrowLeft,
+  CheckCircle,
+  Clock,
+  Upload,
+  ArrowRight,
+  ShieldCheck,
+  FileText,
+  UserCheck,
+  AlertCircle,
+} from 'lucide-react';
 
 function ApplicationWizardContent() {
   const params = useParams();
@@ -17,6 +27,7 @@ function ApplicationWizardContent() {
 
   const isNew = appId === 'new';
   const existing = !isNew ? tdghDb.getApplicationById(appId) : undefined;
+  const intakeWindows = tdghDb.getIntakeWindows();
 
   const getInitialTrack = (): ProgramTrack => {
     if (existing?.track) return existing.track;
@@ -44,6 +55,9 @@ function ApplicationWizardContent() {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const currentWindow = intakeWindows.find((w) => w.track === track);
+  const isCurrentTrackClosed = currentWindow ? !currentWindow.isOpen : false;
+
   const handleNext = () => {
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
@@ -62,6 +76,8 @@ function ApplicationWizardContent() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const initialStage = isCurrentTrackClosed ? 'WAITLISTED' : 'SUBMITTED';
+
     setTimeout(() => {
       if (isNew) {
         const created = tdghDb.createApplication({
@@ -70,7 +86,7 @@ function ApplicationWizardContent() {
           phone: formData.phone,
           suburb: formData.suburb,
           track,
-          stage: 'SUBMITTED',
+          stage: initialStage,
           payload: {
             motivation: formData.motivation,
             educationLevel: formData.educationLevel,
@@ -163,6 +179,33 @@ function ApplicationWizardContent() {
             );
           })}
         </div>
+
+        {/* Existing Application Alerts (Waitlisted / Mentor Assigned) */}
+        {existing?.stage === 'WAITLISTED' && (
+          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-3.5 text-xs text-amber-950 font-sans">
+            <Clock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <div className="font-mono font-bold uppercase text-amber-900 flex items-center gap-2">
+                <span>Priority Waitlist Active</span>
+                <span className="text-[10px] bg-amber-200/60 text-amber-800 px-2 py-0.5 rounded font-mono">
+                  Dossier Safely Banked
+                </span>
+              </div>
+              <p className="text-amber-800 leading-relaxed">
+                Your application details and motivation are securely stored in our admissions database. Admissions for <strong>{existing.track}</strong> officially re-open on <strong>{currentWindow?.nextOpenDate || 'early 2027'}</strong>. When intake commences, your completed dossier will be prioritized in the front of the review queue.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {existing?.assignedMentorName && (
+          <div className="p-4 bg-blue-50 rounded-2xl border border-blue-200 flex items-center gap-3 text-xs text-blue-950">
+            <UserCheck className="w-5 h-5 text-electric-cobalt shrink-0" />
+            <div>
+              <strong>Dedicated Mentor Assigned:</strong> <span className="font-semibold text-electric-cobalt">{existing.assignedMentorName}</span>. Your weekly mentorship cadence and progress deliverables are tracked via the BMS portal.
+            </div>
+          </div>
+        )}
       </div>
 
       {savedSuccess && (
@@ -245,90 +288,158 @@ function ApplicationWizardContent() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setTrack('CODETREPRENEURS')}
-                  className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
-                    track === 'CODETREPRENEURS'
-                      ? 'border-electric-cobalt bg-blue-50/50 shadow-sm'
-                      : 'border-porcelain-border hover:border-obsidian'
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <span className="text-xs font-mono font-bold text-electric-cobalt">1-Year</span>
-                    <h4 className="font-bold text-base text-obsidian">Codetrepreneurs</h4>
-                    <p className="text-xs text-obsidian-600">
-                      Full-stack web dev, TypeScript, PostgreSQL, and Lean Startup.
-                    </p>
-                  </div>
-                  <Badge variant={track === 'CODETREPRENEURS' ? 'electric' : 'default'} className="mt-4">
-                    {track === 'CODETREPRENEURS' ? 'Selected' : 'Select'}
-                  </Badge>
-                </button>
+                {/* CODETREPRENEURS */}
+                {(() => {
+                  const win = intakeWindows.find((w) => w.track === 'CODETREPRENEURS');
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setTrack('CODETREPRENEURS')}
+                      className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                        track === 'CODETREPRENEURS'
+                          ? 'border-electric-cobalt bg-blue-50/50 shadow-sm'
+                          : 'border-porcelain-border hover:border-obsidian'
+                      }`}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-bold text-electric-cobalt">1-Year</span>
+                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${win?.isOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {win?.isOpen ? 'Intake Open' : 'Waitlist'}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-base text-obsidian">Codetrepreneurs</h4>
+                        <p className="text-xs text-obsidian-600">
+                          Full-stack web dev, TypeScript, PostgreSQL, and Lean Startup.
+                        </p>
+                        {win?.isOpen && win.deadlineDate && (
+                          <p className="text-[10px] font-mono text-emerald-700">Deadline: {win.deadlineDate}</p>
+                        )}
+                        {!win?.isOpen && win?.nextOpenDate && (
+                          <p className="text-[10px] font-mono text-amber-700">Opens {win.nextOpenDate}</p>
+                        )}
+                      </div>
+                      <Badge variant={track === 'CODETREPRENEURS' ? 'electric' : 'default'} className="mt-4">
+                        {track === 'CODETREPRENEURS' ? 'Selected' : 'Select'}
+                      </Badge>
+                    </button>
+                  );
+                })()}
 
-                <button
-                  type="button"
-                  onClick={() => setTrack('MAKER_3D')}
-                  className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
-                    track === 'MAKER_3D'
-                      ? 'border-amber-500 bg-amber-50/50 shadow-sm'
-                      : 'border-porcelain-border hover:border-obsidian'
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <span className="text-xs font-mono font-bold text-amber-600">6-Month</span>
-                    <h4 className="font-bold text-base text-obsidian">3D Printing Studio</h4>
-                    <p className="text-xs text-obsidian-600">
-                      CAD design, FDM/SLA slicers, and circular plastics recycling.
-                    </p>
-                  </div>
-                  <Badge variant={track === 'MAKER_3D' ? 'amber' : 'default'} className="mt-4">
-                    {track === 'MAKER_3D' ? 'Selected' : 'Select'}
-                  </Badge>
-                </button>
+                {/* MAKER_3D */}
+                {(() => {
+                  const win = intakeWindows.find((w) => w.track === 'MAKER_3D');
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setTrack('MAKER_3D')}
+                      className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                        track === 'MAKER_3D'
+                          ? 'border-amber-500 bg-amber-50/50 shadow-sm'
+                          : 'border-porcelain-border hover:border-obsidian'
+                      }`}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-bold text-amber-600">6-Month</span>
+                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${win?.isOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {win?.isOpen ? 'Intake Open' : 'Waitlist Active'}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-base text-obsidian">3D Printing Studio</h4>
+                        <p className="text-xs text-obsidian-600">
+                          CAD design, FDM/SLA slicers, and circular plastics recycling.
+                        </p>
+                        {!win?.isOpen && win?.nextOpenDate && (
+                          <p className="text-[10px] font-mono text-amber-700 font-semibold">
+                            Re-opens {win.nextOpenDate} (Priority Queue)
+                          </p>
+                        )}
+                      </div>
+                      <Badge variant={track === 'MAKER_3D' ? 'amber' : 'default'} className="mt-4">
+                        {track === 'MAKER_3D' ? 'Selected' : 'Select'}
+                      </Badge>
+                    </button>
+                  );
+                })()}
 
-                <button
-                  type="button"
-                  onClick={() => setTrack('INCUBATION')}
-                  className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
-                    track === 'INCUBATION'
-                      ? 'border-purple-600 bg-purple-50/50 shadow-sm'
-                      : 'border-porcelain-border hover:border-obsidian'
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <span className="text-xs font-mono font-bold text-purple-600">10-Week</span>
-                    <h4 className="font-bold text-base text-obsidian">Pre-Incubation BMS</h4>
-                    <p className="text-xs text-obsidian-600">
-                      For registered founders with prototype needing governance & seed capital.
-                    </p>
-                  </div>
-                  <Badge variant={track === 'INCUBATION' ? 'purple' : 'default'} className="mt-4">
-                    {track === 'INCUBATION' ? 'Selected' : 'Select'}
-                  </Badge>
-                </button>
+                {/* INCUBATION */}
+                {(() => {
+                  const win = intakeWindows.find((w) => w.track === 'INCUBATION');
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setTrack('INCUBATION')}
+                      className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                        track === 'INCUBATION'
+                          ? 'border-purple-600 bg-purple-50/50 shadow-sm'
+                          : 'border-porcelain-border hover:border-obsidian'
+                      }`}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-bold text-purple-600">10-Week</span>
+                          <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${win?.isOpen ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {win?.isOpen ? 'Intake Open' : 'Waitlist'}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-base text-obsidian">Pre-Incubation BMS</h4>
+                        <p className="text-xs text-obsidian-600">
+                          For registered founders with prototype needing governance & seed capital.
+                        </p>
+                        {win?.isOpen && win.deadlineDate && (
+                          <p className="text-[10px] font-mono text-purple-700">Deadline: {win.deadlineDate}</p>
+                        )}
+                      </div>
+                      <Badge variant={track === 'INCUBATION' ? 'purple' : 'default'} className="mt-4">
+                        {track === 'INCUBATION' ? 'Selected' : 'Select'}
+                      </Badge>
+                    </button>
+                  );
+                })()}
 
-                <button
-                  type="button"
-                  onClick={() => setTrack('COWORKING')}
-                  className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
-                    track === 'COWORKING'
-                      ? 'border-emerald-600 bg-emerald-50/50 shadow-sm'
-                      : 'border-porcelain-border hover:border-obsidian'
-                  }`}
-                >
-                  <div className="space-y-2">
-                    <span className="text-xs font-mono font-bold text-emerald-600">Flexible</span>
-                    <h4 className="font-bold text-base text-obsidian">Co-Working Desk</h4>
-                    <p className="text-xs text-obsidian-600">
-                      Hot desk or dedicated pod, 1Gbps unshaped fiber, and backup solar power.
-                    </p>
-                  </div>
-                  <Badge variant={track === 'COWORKING' ? 'emerald' : 'default'} className="mt-4">
-                    {track === 'COWORKING' ? 'Selected' : 'Select'}
-                  </Badge>
-                </button>
+                {/* COWORKING */}
+                {(() => {
+                  const win = intakeWindows.find((w) => w.track === 'COWORKING');
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setTrack('COWORKING')}
+                      className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                        track === 'COWORKING'
+                          ? 'border-emerald-600 bg-emerald-50/50 shadow-sm'
+                          : 'border-porcelain-border hover:border-obsidian'
+                      }`}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono font-bold text-emerald-600">Flexible</span>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800">
+                            Year-Round
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-base text-obsidian">Co-Working Desk</h4>
+                        <p className="text-xs text-obsidian-600">
+                          Hot desk or dedicated pod, 1Gbps unshaped fiber, and backup solar power.
+                        </p>
+                      </div>
+                      <Badge variant={track === 'COWORKING' ? 'emerald' : 'default'} className="mt-4">
+                        {track === 'COWORKING' ? 'Selected' : 'Select'}
+                      </Badge>
+                    </button>
+                  );
+                })()}
               </div>
+
+              {/* Notice if selected track is closed */}
+              {isCurrentTrackClosed && (
+                <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 font-mono flex items-start gap-2">
+                  <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Waitlist Information:</strong> Applications for this pathway are currently off-cycle until {currentWindow?.nextOpenDate || 'the next scheduled cohort'}. You can complete and save your submission today — your profile will be securely preserved and prioritized when admissions review opens.
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-1.5 pt-4">
                 <label className="text-xs font-mono font-semibold text-obsidian uppercase">
@@ -422,6 +533,22 @@ function ApplicationWizardContent() {
                 </div>
               </div>
 
+              {/* Waitlist Notice Banner if Track Closed */}
+              {isCurrentTrackClosed && (
+                <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 space-y-2 text-xs">
+                  <div className="flex items-center gap-2 font-bold text-amber-900 font-mono">
+                    <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                    Off-Cycle Admissions Notice — Priority Waitlist Active
+                  </div>
+                  <p className="text-amber-800 leading-relaxed">
+                    Admissions for <strong>{currentWindow?.title || track}</strong> are currently off-cycle until <strong>{currentWindow?.nextOpenDate || 'the upcoming intake'}</strong>.
+                  </p>
+                  <p className="text-amber-800 leading-relaxed font-semibold">
+                    By submitting your application today, your full dossier and motivation will be securely banked in our system. You will receive immediate priority ranking on our waitlist and our admissions committee will process your application the moment admissions re-open!
+                  </p>
+                </div>
+              )}
+
               {/* Pitch Deck Upload for Incubation */}
               {track === 'INCUBATION' && (
                 <div className="p-4 bg-purple-50 rounded-2xl border border-purple-200 space-y-2">
@@ -463,9 +590,19 @@ function ApplicationWizardContent() {
                 variant="primary"
                 size="lg"
                 isLoading={isSubmitting}
-                className="bg-electric-cobalt hover:bg-blue-700 shadow-glow-blue"
+                className={
+                  isCurrentTrackClosed
+                    ? 'bg-amber-600 hover:bg-amber-700 shadow-md text-white'
+                    : 'bg-electric-cobalt hover:bg-blue-700 shadow-glow-blue'
+                }
               >
-                Submit Application to Admissions Committee &rarr;
+                {isCurrentTrackClosed ? (
+                  <span className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" /> Bank Dossier in Priority Waitlist &rarr;
+                  </span>
+                ) : (
+                  'Submit Application to Admissions Committee \u2192'
+                )}
               </Button>
             )}
           </div>

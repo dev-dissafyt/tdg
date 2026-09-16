@@ -5,6 +5,7 @@ import {
   SEED_TEAM,
   SEED_TICKETS,
   SEED_APPLICATIONS,
+  SEED_INTAKE_WINDOWS,
   SEED_BMS_CANVAS,
   SEED_BMS_ROADMAP,
   SEED_BMS_KPIS,
@@ -16,6 +17,9 @@ import {
   TeamMember,
   Ticket,
   Application,
+  IntakeWindow,
+  ApplicationVerification,
+  ProgramTrack,
   BmsCanvas,
   BmsMilestone,
   BmsKpis,
@@ -30,6 +34,7 @@ class TdghRepository {
   private teamMembers: TeamMember[] = [...SEED_TEAM];
   private tickets: Ticket[] = [...SEED_TICKETS];
   private applications: Application[] = [...SEED_APPLICATIONS];
+  private intakeWindows: IntakeWindow[] = [...SEED_INTAKE_WINDOWS];
   private bmsCanvases: Record<string, BmsCanvas> = {
     kasipay: { ...SEED_BMS_CANVAS },
   };
@@ -160,6 +165,46 @@ class TdghRepository {
     }
     app.updatedAt = new Date().toISOString();
     return app;
+  }
+
+  assignMentorToApplication(appId: string, mentorId: string, mentorName: string): Application {
+    const app = this.getApplicationById(appId);
+    if (!app) throw new Error('Application not found');
+    app.assignedMentorId = mentorId;
+    app.assignedMentorName = mentorName;
+    app.stage = 'ACCEPTED';
+    app.updatedAt = new Date().toISOString();
+    return app;
+  }
+
+  updateApplicationVerification(appId: string, verification: ApplicationVerification): Application {
+    const app = this.getApplicationById(appId);
+    if (!app) throw new Error('Application not found');
+    app.verificationStatus = {
+      ...app.verificationStatus,
+      ...verification,
+      verifiedAt: new Date().toISOString(),
+    };
+    app.updatedAt = new Date().toISOString();
+    return app;
+  }
+
+  // Intake Windows Controls
+  getIntakeWindows(): IntakeWindow[] {
+    return this.intakeWindows;
+  }
+
+  getIntakeWindowByTrack(track: ProgramTrack): IntakeWindow | undefined {
+    return this.intakeWindows.find((w) => w.track === track);
+  }
+
+  updateIntakeWindow(track: ProgramTrack, updates: Partial<IntakeWindow>): IntakeWindow {
+    const idx = this.intakeWindows.findIndex((w) => w.track === track);
+    if (idx >= 0) {
+      this.intakeWindows[idx] = { ...this.intakeWindows[idx], ...updates };
+      return this.intakeWindows[idx];
+    }
+    throw new Error(`Intake window for track ${track} not found`);
   }
 
   // BMS Multi-Tenant
