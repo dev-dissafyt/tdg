@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { tdghDb } from '@tdgh/db';
 import { BmcBlockType, BmsCanvas, BmcCard } from '@tdgh/types';
@@ -164,43 +163,30 @@ export default function BusinessModelCanvasPage() {
 
   return (
     <div className="space-y-6">
-      {/* Title & Actions Bar */}
+      {/* Canvas Meta & Filter Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-porcelain-border shadow-xs">
-        <div className="flex items-start sm:items-center gap-4">
-          <div className="hidden sm:flex bg-porcelain px-3 py-1.5 rounded-xl border border-porcelain-border shrink-0">
-            <Image
-              src="/logo.png"
-              alt="The Daily Grind Hub"
-              width={140}
-              height={33}
-              className="h-8 w-auto object-contain"
-            />
+        <div>
+          <div className="flex items-center gap-2">
+            <Badge variant="purple">9-Box Canvas</Badge>
+            <span className="text-xs font-mono text-obsidian-500 uppercase">
+              Alexander Osterwalder Standard &bull; Lean Canvas Matrix
+            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <Badge variant="purple">9-Box Business Model Canvas</Badge>
-              <span className="text-xs font-mono text-obsidian-500 uppercase">
-                Lean Startup Framework &bull; Alexander Osterwalder Standard
-              </span>
-            </div>
-            <h1 className="text-2xl font-black text-obsidian tracking-tight mt-1">
-              {canvas.businessName} &mdash; Strategic BMC
-            </h1>
-            <p className="text-xs text-obsidian-500 font-mono">
-              Tagline: "{canvas.tagline}" &bull; Auto-saved: {new Date(canvas.lastEdited).toLocaleTimeString()}
-            </p>
-          </div>
+          <h1 className="text-2xl font-black text-obsidian tracking-tight mt-1">
+            Venture Business Model Canvas
+          </h1>
+          <p className="text-xs text-obsidian-500 font-mono mt-0.5">
+            Auto-saved: {new Date(canvas.lastEdited).toLocaleTimeString()} &bull; Tagline: "{canvas.tagline}"
+          </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => alert('PDF Export rendering canvas matrix with investor executive summary...')}
-            className="text-xs font-mono"
-          >
-            <Download className="w-3.5 h-3.5 mr-1" /> Export Canvas PDF
-          </Button>
+        <div className="flex items-center gap-2.5">
+          <div className="bg-porcelain px-3.5 py-2 rounded-xl border border-porcelain-border text-xs font-mono text-obsidian-600">
+            Validated Hypotheses:{' '}
+            <span className="font-bold text-purple-700">
+              {Object.values(canvas.blocks).flat().length}
+            </span>
+          </div>
         </div>
       </div>
 
