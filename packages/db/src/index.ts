@@ -243,6 +243,26 @@ class TdghRepository {
     return m;
   }
 
+  addBmsMilestone(businessSlug: string, milestone: Omit<BmsMilestone, 'id'>): BmsMilestone {
+    const list = this.getBmsRoadmap(businessSlug);
+    const newMilestone: BmsMilestone = {
+      ...milestone,
+      id: `ms-${Date.now()}`,
+    };
+    list.push(newMilestone);
+    return newMilestone;
+  }
+
+  submitBmsDeliverable(businessSlug: string, milestoneId: string, filename: string, proofUrl?: string): BmsMilestone {
+    const list = this.getBmsRoadmap(businessSlug);
+    const m = list.find((item) => item.id === milestoneId);
+    if (!m) throw new Error('Milestone not found');
+    m.deliverableSubmitted = filename;
+    if (proofUrl) m.deliverableProofUrl = proofUrl;
+    m.completed = true;
+    return m;
+  }
+
   getBmsKpis(businessSlug: string): BmsKpis {
     if (!this.bmsKpis[businessSlug]) {
       this.bmsKpis[businessSlug] = { ...SEED_BMS_KPIS };
@@ -254,6 +274,19 @@ class TdghRepository {
     const existing = this.getBmsKpis(businessSlug);
     this.bmsKpis[businessSlug] = { ...existing, ...kpis };
     return this.bmsKpis[businessSlug];
+  }
+
+  syncBmsAccounting(businessSlug: string): BmsKpis {
+    const existing = this.getBmsKpis(businessSlug);
+    const simulatedDelta = Math.floor((Math.random() - 0.3) * 5000);
+    const updated = {
+      ...existing,
+      cashOnHandZar: Math.max(50000, existing.cashOnHandZar + simulatedDelta),
+      lastAccountingSync: new Date().toISOString(),
+      reconciledLedgerBalanceZar: Math.max(50000, existing.cashOnHandZar + simulatedDelta),
+    };
+    this.bmsKpis[businessSlug] = updated;
+    return updated;
   }
 
   getBmsDocs(businessSlug: string): BmsDocument[] {

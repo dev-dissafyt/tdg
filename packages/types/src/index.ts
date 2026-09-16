@@ -246,6 +246,17 @@ export interface BmsCanvas {
   tagline: string;
   founderId: string;
   lastEdited: string;
+  founderName?: string;
+  founderEmail?: string;
+  founderPhone?: string;
+  industrySector?: string;
+  stage?: string;
+  cipcNumber?: string;
+  taxPin?: string;
+  location?: string;
+  websiteUrl?: string;
+  assignedMentorId?: string;
+  assignedMentorName?: string;
   blocks: Record<BmcBlockType, BmcCard[]>;
 }
 
@@ -257,7 +268,13 @@ export interface BmsMilestone {
   completed: boolean;
   notes?: string;
   deliverableSubmitted?: string;
+  deliverableProofUrl?: string;
   mentorApproved: boolean;
+  assignedMentorId?: string;
+  assignedMentorName?: string;
+  mentorDirective?: string;
+  dueDate?: string;
+  feedbackFromMentor?: string;
 }
 
 export interface BmsKpis {
@@ -268,6 +285,14 @@ export interface BmsKpis {
   customerAcquisitionCostZar: number;
   totalCustomers: number;
   teamSize: number;
+  accountingProvider?: 'SAGE' | 'XERO' | 'QUICKBOOKS' | 'TDGH_LEDGER';
+  accountingPortalUrl?: string;
+  lastAccountingSync?: string;
+  sarsVatRegistered?: boolean;
+  bankAccountName?: string;
+  reconciledLedgerBalanceZar?: number;
+  accountsReceivableZar?: number;
+  accountsPayableZar?: number;
 }
 
 export type ComplianceDocType =

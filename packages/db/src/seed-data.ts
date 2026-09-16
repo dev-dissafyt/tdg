@@ -756,9 +756,20 @@ export const SEED_MENTORSHIP_SESSIONS: MentorshipSession[] = [
 export const SEED_BMS_CANVAS: BmsCanvas = {
   id: 'canvas-kasipay',
   businessSlug: 'kasipay',
-  businessName: 'KasiPay Financial Technologies',
+  businessName: 'KasiPay Financial Technologies (Pty) Ltd',
   tagline: 'The Offline-First Payment Terminal for Township Spaza Retailers',
   founderId: 'mem-1',
+  founderName: 'Sipho Ndlovu',
+  founderEmail: 'sipho@kasipay.co.za',
+  founderPhone: '+27 82 456 7890',
+  industrySector: 'Fintech & Micro-Payments',
+  stage: 'Pilot Phase (26 Active Retailers)',
+  cipcNumber: '2024/782194/07',
+  taxPin: '9823-1490-5512',
+  location: 'Kraaifontein (Scottsville & Bloekombos)',
+  websiteUrl: 'https://kasipay.co.za',
+  assignedMentorId: 'team-4',
+  assignedMentorName: 'Tariq Johnson',
   lastEdited: '2025-09-15T18:00:00Z',
   blocks: {
     KEY_PARTNERS: [
@@ -818,6 +829,9 @@ export const SEED_BMS_ROADMAP: BmsMilestone[] = [
     ],
     completed: true,
     mentorApproved: true,
+    assignedMentorId: 'team-4',
+    assignedMentorName: 'Tariq Johnson',
+    mentorDirective: 'Target merchants on 4th Avenue who were impacted by stage 4 load-shedding. Verify their average transaction size.',
     deliverableSubmitted: 'spaza_interview_transcripts_v1.pdf',
     notes: 'Exceptional interview depth. Discovered 84% of merchants lose sales during load-shedding card outages.',
   },
@@ -832,6 +846,9 @@ export const SEED_BMS_ROADMAP: BmsMilestone[] = [
     ],
     completed: true,
     mentorApproved: true,
+    assignedMentorId: 'team-4',
+    assignedMentorName: 'Tariq Johnson',
+    mentorDirective: 'Focus on Bluetooth thermal printer handshake latency under 2 seconds. Work with Kurt in the 3D lab for casing stress-tests.',
     deliverableSubmitted: 'kasipay_mvp_v0.9_demo.mp4',
     notes: 'Passed 30-day pilot test with zero lost transactions.',
   },
@@ -846,6 +863,9 @@ export const SEED_BMS_ROADMAP: BmsMilestone[] = [
     ],
     completed: true,
     mentorApproved: true,
+    assignedMentorId: 'team-4',
+    assignedMentorName: 'Tariq Johnson',
+    mentorDirective: 'Ensure bank confirmation letter matches CIPC registered legal trade name exactly to prevent switch settlement delays.',
     deliverableSubmitted: 'cipc_and_tax_pin_kasipay.pdf',
   },
   {
@@ -859,6 +879,9 @@ export const SEED_BMS_ROADMAP: BmsMilestone[] = [
     ],
     completed: false,
     mentorApproved: false,
+    assignedMentorId: 'team-4',
+    assignedMentorName: 'Tariq Johnson',
+    mentorDirective: 'Verify transaction switch fees against Ozow/Stitch tiered pricing before locking merchant 0.8% transaction fee.',
     notes: 'Currently onboarding merchants #14 through #20.',
   },
   {
@@ -872,6 +895,9 @@ export const SEED_BMS_ROADMAP: BmsMilestone[] = [
     ],
     completed: false,
     mentorApproved: false,
+    assignedMentorId: 'team-4',
+    assignedMentorName: 'Tariq Johnson',
+    mentorDirective: 'Include live demo on stage with POS offline sync. We will schedule dry-run rehearsals in the main board room.',
   },
 ];
 
@@ -883,6 +909,14 @@ export const SEED_BMS_KPIS: BmsKpis = {
   customerAcquisitionCostZar: 320,
   totalCustomers: 26,
   teamSize: 3,
+  accountingProvider: 'SAGE',
+  accountingPortalUrl: 'https://accounting.sageone.co.za',
+  lastAccountingSync: '2025-09-16T10:45:00Z',
+  sarsVatRegistered: true,
+  bankAccountName: 'First National Bank - Business Cheque (Acc #62819482910)',
+  reconciledLedgerBalanceZar: 114000,
+  accountsReceivableZar: 12600,
+  accountsPayableZar: 8400,
 };
 
 export const SEED_BMS_DOCS: BmsDocument[] = [

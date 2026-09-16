@@ -26,6 +26,7 @@ import {
   User,
 } from 'lucide-react';
 import { Badge, Button } from '@tdgh/ui';
+import { tdghDb } from '@tdgh/db';
 
 export default function BmsRootLayout({
   children,
@@ -41,6 +42,20 @@ export default function BmsRootLayout({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [isSprintMinimized, setIsSprintMinimized] = useState(false);
+  const [canvasData, setCanvasData] = useState(() => tdghDb.getBmsCanvas(currentSlug));
+
+  // Sync state when slug changes or custom update event fires
+  useEffect(() => {
+    setCanvasData(tdghDb.getBmsCanvas(currentSlug));
+  }, [currentSlug]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setCanvasData({ ...tdghDb.getBmsCanvas(currentSlug) });
+    };
+    window.addEventListener('tdgh-canvas-updated', handleUpdate);
+    return () => window.removeEventListener('tdgh-canvas-updated', handleUpdate);
+  }, [currentSlug]);
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -207,7 +222,7 @@ export default function BmsRootLayout({
                 <div className="p-2.5 rounded-xl bg-white border border-porcelain-border shadow-xs space-y-1.5">
                   <div className="flex items-center justify-between gap-1.5">
                     <span className="text-xs font-bold text-obsidian truncate">
-                      KasiPay Technologies
+                      {canvasData.businessName}
                     </span>
                     <Badge variant="purple" className="text-[9px] px-1.5 py-0 shrink-0">
                       Sprint #3
@@ -216,17 +231,17 @@ export default function BmsRootLayout({
                   <div className="text-[11px] font-mono space-y-1 pt-1 border-t border-porcelain-border">
                     <div className="flex items-center justify-between">
                       <span className="text-obsidian-400">Founder:</span>
-                      <span className="font-semibold text-obsidian">Sipho Ndlovu</span>
+                      <span className="font-semibold text-obsidian">{canvasData.founderName || 'Sipho Ndlovu'}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-obsidian-400">Mentor:</span>
-                      <span className="font-semibold text-purple-700">Tariq Johnson</span>
+                      <span className="font-semibold text-purple-700">{canvasData.assignedMentorName || 'Tariq Johnson'}</span>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div
-                  title="KasiPay Technologies • Founder: Sipho Ndlovu • Mentor: Tariq Johnson (Sprint #3)"
+                  title={`${canvasData.businessName} • Founder: ${canvasData.founderName || 'Sipho Ndlovu'} • Mentor: ${canvasData.assignedMentorName || 'Tariq Johnson'} (Sprint #3)`}
                   className="w-10 h-10 mx-auto rounded-xl bg-white border border-porcelain-border shadow-xs flex items-center justify-center cursor-default text-purple-700 font-mono font-bold text-xs"
                 >
                   <User className="w-4 h-4 text-purple-700" />
@@ -278,7 +293,7 @@ export default function BmsRootLayout({
           }`}
         >
           {/* ======================================================================= */}
-          {/* 3. SIMPLIFIED TOP HEADER (With Company Logo Only on Right) */}
+          {/* 3. SIMPLIFIED TOP HEADER (With Incubatee Business Name alongside Logo) */}
           {/* ======================================================================= */}
           <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-porcelain-border h-18 px-4 sm:px-8 flex items-center justify-between shadow-xs">
             {/* Left: Mobile Drawer Trigger + Active Module Breadcrumb */}
@@ -302,13 +317,27 @@ export default function BmsRootLayout({
               </div>
             </div>
 
-            {/* Right: Company Logo Only */}
-            <div className="flex items-center">
+            {/* Right: Incubatee Business Name Alongside Logo */}
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <div className="text-xs font-black text-obsidian tracking-tight leading-tight">
+                  {canvasData.businessName}
+                </div>
+                <div className="text-[10px] font-mono text-obsidian-400 line-clamp-1 max-w-[280px]">
+                  {canvasData.tagline}
+                </div>
+              </div>
               <div
-                className="w-10 h-10 rounded-xl bg-purple-700 text-white flex items-center justify-center font-mono font-black text-base shadow-tactile hover:bg-purple-800 transition-colors cursor-pointer"
-                title="KasiPay Technologies (Pty) Ltd"
+                className="w-10 h-10 rounded-xl bg-purple-700 text-white flex items-center justify-center font-mono font-black text-sm shadow-tactile hover:bg-purple-800 transition-colors shrink-0 cursor-default"
+                title={`${canvasData.businessName} • Founder: ${canvasData.founderName || 'Sipho Ndlovu'}`}
               >
-                KP
+                {canvasData.businessName
+                  .split(' ')
+                  .map((w) => w[0])
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .join('')
+                  .toUpperCase() || 'KP'}
               </div>
             </div>
           </header>
