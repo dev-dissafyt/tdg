@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { tdghDb } from '@tdgh/db';
 import { Badge, StatCounter, Button } from '@tdgh/ui';
 import { Terminal, Box, Sparkles, Building2, ArrowRight, ShieldCheck, HeartHandshake, Check } from 'lucide-react';
@@ -59,6 +60,59 @@ export default function HomePage() {
               <Check className="w-4 h-4 text-emerald-600" />
               <span>1 Gbps Fiber Backbone</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Institutional & Ecosystem Partners Strip */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-porcelain/60 rounded-2xl border border-porcelain-border p-6 text-center space-y-4">
+          <span className="text-[11px] font-mono uppercase tracking-widest text-obsidian-500 font-semibold block">
+            Ecosystem Partners & Infrastructure Sponsors
+          </span>
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-85 grayscale hover:grayscale-0 transition-all duration-300">
+            <Image
+              src="/partners/rlabs-logo.png"
+              alt="RLabs"
+              width={120}
+              height={36}
+              className="h-7 w-auto object-contain"
+            />
+            <Image
+              src="/partners/UK-Tech-logo.webp"
+              alt="UK-South Africa Tech Hub"
+              width={140}
+              height={36}
+              className="h-8 w-auto object-contain"
+            />
+            <Image
+              src="/partners/Small-Business-Development-Logo.png"
+              alt="Department of Small Business Development"
+              width={180}
+              height={40}
+              className="h-9 w-auto object-contain"
+            />
+            <Image
+              src="/partners/launch-league-logo.png"
+              alt="Launch League"
+              width={130}
+              height={36}
+              className="h-7 w-auto object-contain"
+            />
+            <Image
+              src="/partners/Octotel-Blue-and-Orange-Logo.png"
+              alt="Octotel"
+              width={120}
+              height={36}
+              className="h-7 w-auto object-contain"
+            />
+            <Image
+              src="/partners/rsaweeb-logo.png"
+              alt="RSAWEB"
+              width={120}
+              height={36}
+              className="h-6 w-auto object-contain"
+            />
           </div>
         </div>
       </section>
