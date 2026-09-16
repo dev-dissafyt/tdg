@@ -290,3 +290,39 @@ export interface BmsDocument {
   uploadedAt?: string;
   expiryDate?: string;
 }
+
+export interface MentorshipSession {
+  id: string;
+  mentorId: string;
+  mentorName: string;
+  menteeId: string;
+  menteeName: string;
+  ventureName: string;
+  sessionDate: string;
+  topic: string;
+  feedbackNotes: string;
+  actionItems: string[];
+  nextMeetingDate?: string;
+  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED';
+  createdAt: string;
+}
+
+export interface MenteePortfolioItem {
+  applicationId: string;
+  menteeName: string;
+  menteeEmail: string;
+  menteePhone?: string;
+  suburb: string;
+  ventureName: string;
+  businessSlug: string;
+  track: ProgramTrack;
+  stage: ApplicationStage;
+  assignedMentorId: string;
+  assignedMentorName: string;
+  sprintProgressPercent: number;
+  currentMilestonePhase: string;
+  pendingDeliverable?: string;
+  lastSessionDate?: string;
+  nextSessionDate?: string;
+  notes?: string;
+}

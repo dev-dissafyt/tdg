@@ -6,6 +6,7 @@ import {
   SEED_TICKETS,
   SEED_APPLICATIONS,
   SEED_INTAKE_WINDOWS,
+  SEED_MENTORSHIP_SESSIONS,
   SEED_BMS_CANVAS,
   SEED_BMS_ROADMAP,
   SEED_BMS_KPIS,
@@ -19,6 +20,8 @@ import {
   Application,
   IntakeWindow,
   ApplicationVerification,
+  MentorshipSession,
+  MenteePortfolioItem,
   ProgramTrack,
   BmsCanvas,
   BmsMilestone,
@@ -35,6 +38,7 @@ class TdghRepository {
   private tickets: Ticket[] = [...SEED_TICKETS];
   private applications: Application[] = [...SEED_APPLICATIONS];
   private intakeWindows: IntakeWindow[] = [...SEED_INTAKE_WINDOWS];
+  private mentorshipSessions: MentorshipSession[] = [...SEED_MENTORSHIP_SESSIONS];
   private bmsCanvases: Record<string, BmsCanvas> = {
     kasipay: { ...SEED_BMS_CANVAS },
   };
@@ -257,6 +261,92 @@ class TdghRepository {
       this.bmsDocs[businessSlug] = [...SEED_BMS_DOCS];
     }
     return this.bmsDocs[businessSlug];
+  }
+
+  // Mentorship & Mentees Management
+  getMentorshipSessions(mentorId?: string): MentorshipSession[] {
+    if (!mentorId || mentorId === 'ALL') {
+      return [...this.mentorshipSessions].sort(
+        (a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime()
+      );
+    }
+    return this.mentorshipSessions
+      .filter((s) => s.mentorId === mentorId)
+      .sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime());
+  }
+
+  createMentorshipSession(
+    session: Omit<MentorshipSession, 'id' | 'createdAt'>
+  ): MentorshipSession {
+    const newSession: MentorshipSession = {
+      ...session,
+      id: `ses-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.mentorshipSessions.unshift(newSession);
+    return newSession;
+  }
+
+  getMenteePortfolio(mentorId?: string): MenteePortfolioItem[] {
+    const acceptedApps = this.applications.filter(
+      (a) => a.assignedMentorId || a.stage === 'ACCEPTED'
+    );
+
+    const filtered =
+      !mentorId || mentorId === 'ALL'
+        ? acceptedApps
+        : acceptedApps.filter((a) => a.assignedMentorId === mentorId);
+
+    return filtered.map((app) => {
+      let slug = 'kasipay';
+      if (app.payload.businessConcept?.toLowerCase().includes('kraai-med')) {
+        slug = 'kraai-med';
+      } else if (app.payload.businessConcept?.toLowerCase().includes('greenwaste') || app.track === 'MAKER_3D') {
+        slug = 'greenwaste';
+      } else if (app.track === 'CODETREPRENEURS') {
+        slug = 'civicalert';
+      }
+
+      const roadmap = this.getBmsRoadmap(slug);
+      const completed = roadmap.filter((m) => m.completed).length;
+      const progressPercent = Math.round((completed / roadmap.length) * 100);
+      const currentPhase = roadmap.find((m) => !m.completed)?.phaseTitle || 'Venture Scale & Governance';
+
+      const sessions = this.mentorshipSessions.filter(
+        (s) => s.menteeId === app.id || s.menteeName === app.fullName
+      );
+      const lastSession = sessions.find((s) => s.status === 'COMPLETED');
+      const nextSession = sessions.find((s) => s.status === 'SCHEDULED');
+
+      return {
+        applicationId: app.id,
+        menteeName: app.fullName,
+        menteeEmail: app.email,
+        menteePhone: app.phone,
+        suburb: app.suburb,
+        ventureName: app.payload.businessConcept || `${app.fullName}'s Capstone`,
+        businessSlug: slug,
+        track: app.track,
+        stage: app.stage,
+        assignedMentorId: app.assignedMentorId || 'team-4',
+        assignedMentorName: app.assignedMentorName || 'Tariq Johnson',
+        sprintProgressPercent: progressPercent,
+        currentMilestonePhase: currentPhase,
+        pendingDeliverable: roadmap.find((m) => !m.mentorApproved)?.phaseTitle,
+        lastSessionDate: lastSession?.sessionDate,
+        nextSessionDate: nextSession?.sessionDate,
+        notes: app.scores?.[0]?.notes,
+      };
+    });
+  }
+
+  approveBmsMilestone(businessSlug: string, milestoneId: string): BmsMilestone {
+    const list = this.getBmsRoadmap(businessSlug);
+    const m = list.find((item) => item.id === milestoneId);
+    if (!m) throw new Error('Milestone not found');
+    m.completed = true;
+    m.mentorApproved = true;
+    return m;
   }
 }
 
