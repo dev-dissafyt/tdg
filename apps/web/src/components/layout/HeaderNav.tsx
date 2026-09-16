@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   ChevronDown,
@@ -45,18 +46,15 @@ export function HeaderNav() {
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-porcelain-border shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-3 group shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-obsidian text-white flex items-center justify-center font-mono font-black text-xl tracking-tighter group-hover:bg-electric-cobalt transition-colors shadow-tactile">
-            TDG
-          </div>
-          <div className="flex flex-col">
-            <span className="font-black tracking-tight text-lg leading-tight text-obsidian uppercase">
-              The Daily Grind
-            </span>
-            <span className="text-[11px] font-mono tracking-widest text-obsidian-500 uppercase">
-              Innovation Hub &bull; Scottsville
-            </span>
-          </div>
+        <Link href="/" className="flex items-center gap-3 group shrink-0" title="The Daily Grind Innovation Hub">
+          <Image
+            src="/logo.png"
+            alt="The Daily Grind Hub"
+            width={200}
+            height={48}
+            priority
+            className="h-9 sm:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-102"
+          />
         </Link>
 
         {/* Desktop Navigation Links */}

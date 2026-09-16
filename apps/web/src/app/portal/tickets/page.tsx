@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { tdghDb } from '@tdgh/db';
 import { Ticket, TicketMessage } from '@tdgh/types';
 import { Badge, Button, Input, Textarea, Card, CardContent } from '@tdgh/ui';
@@ -41,16 +42,27 @@ export default function UserTicketsPortalPage() {
       </Link>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Badge variant="electric">Support Triage Pipeline</Badge>
-            <span className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">
-              Scottsville Help Desk
-            </span>
+        <div className="flex items-start sm:items-center gap-4">
+          <div className="hidden sm:flex bg-white px-3 py-1.5 rounded-xl border border-porcelain-border shadow-xs shrink-0">
+            <Image
+              src="/logo.png"
+              alt="The Daily Grind Hub"
+              width={130}
+              height={31}
+              className="h-8 w-auto object-contain"
+            />
           </div>
-          <h1 className="text-3xl font-black text-obsidian tracking-tight mt-1">
-            My Inquiries & Support Tickets
-          </h1>
+          <div>
+            <div className="flex items-center gap-2">
+              <Badge variant="electric">Support Triage Pipeline</Badge>
+              <span className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">
+                Scottsville Help Desk
+              </span>
+            </div>
+            <h1 className="text-3xl font-black text-obsidian tracking-tight mt-1">
+              My Inquiries & Support Tickets
+            </h1>
+          </div>
         </div>
 
         <Link

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { tdghDb } from '@tdgh/db';
 import { Badge, Button, Card, CardContent } from '@tdgh/ui';
 import { Terminal, Box, Sparkles, Building2, Plus, Clock, CheckCircle2, AlertCircle, FileText, ArrowRight } from 'lucide-react';
@@ -14,12 +15,23 @@ export default function PortalDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Welcome Banner */}
       <div className="bg-white rounded-3xl border border-porcelain-border p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-mono uppercase tracking-widest text-obsidian-500">
-              Verified Candidate Dossier
-            </span>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="The Daily Grind Hub"
+              width={140}
+              height={33}
+              className="h-7 w-auto object-contain"
+              priority
+            />
+            <span className="text-obsidian-300">|</span>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-mono uppercase tracking-widest text-obsidian-500">
+                Verified Candidate Dossier
+              </span>
+            </div>
           </div>
           <h1 className="text-3xl font-black text-obsidian tracking-tight">
             Welcome back, Kaylin Fortuin

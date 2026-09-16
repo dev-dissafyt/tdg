@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { tdghDb } from '@tdgh/db';
 import { Application, ProgramTrack } from '@tdgh/types';
 import { Badge, Button, Input, Textarea } from '@tdgh/ui';
@@ -100,18 +101,29 @@ function ApplicationWizardContent() {
       {/* Header & Status Indicator */}
       <div className="bg-white rounded-3xl border border-porcelain-border p-8 shadow-sm space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <Badge variant={existing?.stage === 'ACCEPTED' ? 'emerald' : 'electric'}>
-                {existing ? `Stage: ${existing.stage.replace('_', ' ')}` : 'New Application Wizard'}
-              </Badge>
-              <span className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">
-                Intake 2026
-              </span>
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="hidden sm:flex bg-porcelain px-3 py-1.5 rounded-xl border border-porcelain-border shrink-0">
+              <Image
+                src="/logo.png"
+                alt="The Daily Grind Hub"
+                width={130}
+                height={31}
+                className="h-8 w-auto object-contain"
+              />
             </div>
-            <h1 className="text-3xl font-black text-obsidian tracking-tight mt-1">
-              Multi-Track Fellowship & Incubation Wizard
-            </h1>
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge variant={existing?.stage === 'ACCEPTED' ? 'emerald' : 'electric'}>
+                  {existing ? `Stage: ${existing.stage.replace('_', ' ')}` : 'New Application Wizard'}
+                </Badge>
+                <span className="text-xs font-mono text-obsidian-500 uppercase tracking-wider">
+                  Intake 2026
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-obsidian tracking-tight mt-1">
+                Multi-Track Fellowship & Incubation Wizard
+              </h1>
+            </div>
           </div>
 
           <div className="text-xs font-mono text-obsidian-500 bg-porcelain px-3.5 py-1.5 rounded-xl border border-porcelain-border">

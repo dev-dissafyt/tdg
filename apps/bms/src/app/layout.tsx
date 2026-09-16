@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import './globals.css';
 import {
@@ -43,22 +44,39 @@ export default function BmsRootLayout({
         {/* Top Venture Operational Bar */}
         <header className="sticky top-0 z-40 bg-white border-b border-porcelain-border shadow-xs">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-            {/* Venture Switcher & Branding */}
+            {/* TDGH Incubator & Venture Switcher */}
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-700 text-white flex items-center justify-center font-mono font-black text-lg shadow-tactile">
-                KP
-              </div>
+              <Link
+                href="http://localhost:3000"
+                className="flex items-center border-r border-porcelain-border pr-4 hover:opacity-85 transition-opacity shrink-0"
+                title="Return to The Daily Grind Hub Main Site"
+              >
+                <Image
+                  src="/logo.png"
+                  alt="The Daily Grind Hub"
+                  width={150}
+                  height={36}
+                  className="h-7 sm:h-8 w-auto object-contain"
+                  priority
+                />
+              </Link>
 
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-base text-obsidian">
-                    KasiPay Technologies (Pty) Ltd
-                  </span>
-                  <Badge variant="purple">Pre-Incubator Sprint #3</Badge>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-purple-700 text-white flex items-center justify-center font-mono font-black text-base shadow-tactile shrink-0">
+                  KP
                 </div>
-                <span className="text-[11px] font-mono text-obsidian-500">
-                  TDGH Incubator &bull; Founder: Sipho Ndlovu &bull; Mentor: Tariq Johnson
-                </span>
+
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm sm:text-base text-obsidian">
+                      KasiPay Technologies (Pty) Ltd
+                    </span>
+                    <Badge variant="purple">Sprint #3</Badge>
+                  </div>
+                  <span className="text-[11px] font-mono text-obsidian-500">
+                    Incubatee BMS &bull; Founder: Sipho Ndlovu &bull; Mentor: Tariq Johnson
+                  </span>
+                </div>
               </div>
             </div>
 

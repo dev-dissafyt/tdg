@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { tdghDb } from '@tdgh/db';
 import { BmcBlockType, BmsCanvas, BmcCard } from '@tdgh/types';
@@ -164,20 +165,31 @@ export default function BusinessModelCanvasPage() {
   return (
     <div className="space-y-6">
       {/* Title & Actions Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Badge variant="purple">9-Box Business Model Canvas</Badge>
-            <span className="text-xs font-mono text-obsidian-500 uppercase">
-              Lean Startup Framework &bull; Alexander Osterwalder Standard
-            </span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-porcelain-border shadow-xs">
+        <div className="flex items-start sm:items-center gap-4">
+          <div className="hidden sm:flex bg-porcelain px-3 py-1.5 rounded-xl border border-porcelain-border shrink-0">
+            <Image
+              src="/logo.png"
+              alt="The Daily Grind Hub"
+              width={140}
+              height={33}
+              className="h-8 w-auto object-contain"
+            />
           </div>
-          <h1 className="text-2xl font-black text-obsidian tracking-tight mt-1">
-            {canvas.businessName} &mdash; Strategic BMC
-          </h1>
-          <p className="text-xs text-obsidian-500 font-mono">
-            Tagline: "{canvas.tagline}" &bull; Auto-saved: {new Date(canvas.lastEdited).toLocaleTimeString()}
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <Badge variant="purple">9-Box Business Model Canvas</Badge>
+              <span className="text-xs font-mono text-obsidian-500 uppercase">
+                Lean Startup Framework &bull; Alexander Osterwalder Standard
+              </span>
+            </div>
+            <h1 className="text-2xl font-black text-obsidian tracking-tight mt-1">
+              {canvas.businessName} &mdash; Strategic BMC
+            </h1>
+            <p className="text-xs text-obsidian-500 font-mono">
+              Tagline: "{canvas.tagline}" &bull; Auto-saved: {new Date(canvas.lastEdited).toLocaleTimeString()}
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Badge, Button, Input } from '@tdgh/ui';
 import { User, Mail, Phone, MapPin } from 'lucide-react';
@@ -24,9 +25,16 @@ export default function RegisterPage() {
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-3xl border border-porcelain-border p-8 shadow-sm space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-obsidian text-white flex items-center justify-center font-mono font-black text-xl mx-auto shadow-tactile">
-            TDG
-          </div>
+          <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
+            <Image
+              src="/logo.png"
+              alt="The Daily Grind Hub"
+              width={200}
+              height={48}
+              className="h-11 w-auto mx-auto object-contain mb-1"
+              priority
+            />
+          </Link>
           <h2 className="text-2xl font-black text-obsidian tracking-tight">
             Create Hub Profile
           </h2>

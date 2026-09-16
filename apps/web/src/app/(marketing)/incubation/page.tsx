@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { tdghDb } from '@tdgh/db';
 import { Badge, Button } from '@tdgh/ui';
 import {
@@ -139,7 +140,16 @@ export default function IncubationPage() {
 
         <div className="p-6 bg-obsidian text-white rounded-3xl border border-obsidian-800 shadow-2xl space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-obsidian-800 pb-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <div className="bg-white px-2.5 py-1 rounded-lg">
+                <Image
+                  src="/logo.png"
+                  alt="The Daily Grind Hub"
+                  width={110}
+                  height={26}
+                  className="h-5 w-auto object-contain"
+                />
+              </div>
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
               <span className="font-mono text-xs font-bold text-white">
                 Live Incubatee Case Study: {seedCanvas.businessName}

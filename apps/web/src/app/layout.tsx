@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import './globals.css';
 import { generateHubLocalBusinessSchema } from '@/lib/seo/ai-search-schemas';
 
@@ -90,12 +91,19 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-obsidian-800">
               <div className="md:col-span-1 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-electric-cobalt text-white flex items-center justify-center font-mono font-black text-lg">
-                    TDG
-                  </div>
-                  <span className="font-bold text-lg tracking-tight">The Daily Grind Hub</span>
-                </div>
+                <Link
+                  href="/"
+                  className="inline-block bg-white px-3.5 py-2 rounded-xl shadow-tactile hover:bg-porcelain transition-all group"
+                  title="The Daily Grind Hub"
+                >
+                  <Image
+                    src="/logo.png"
+                    alt="The Daily Grind Hub"
+                    width={180}
+                    height={43}
+                    className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-102"
+                  />
+                </Link>
                 <p className="text-sm text-obsidian-400 leading-relaxed">
                   Transforming job seekers into job creators in Scottsville, Kraaifontein through full-stack software fellowships, additive manufacturing, and venture incubation.
                 </p>
