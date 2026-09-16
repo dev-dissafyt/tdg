@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/about',
     '/team',
     '/contact',
+    '/incubation',
     '/coworking',
     '/codetrepreneurs',
     '/3d-printing',

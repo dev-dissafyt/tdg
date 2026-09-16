@@ -3,6 +3,8 @@ import Link from 'next/link';
 import './globals.css';
 import { generateHubLocalBusinessSchema } from '@/lib/seo/ai-search-schemas';
 
+import { HeaderNav } from '@/components/layout/HeaderNav';
+
 export const metadata: Metadata = {
   title: 'The Daily Grind Hub | Scottsville, Kraaifontein Tech Innovation Ecosystem',
   description:
@@ -77,65 +79,8 @@ export default function RootLayout({
           </div>
         </div>
 
-        {/* Master Navigation Header */}
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-porcelain-border shadow-xs">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-obsidian text-white flex items-center justify-center font-mono font-black text-xl tracking-tighter group-hover:bg-electric-cobalt transition-colors shadow-tactile">
-                TDG
-              </div>
-              <div className="flex flex-col">
-                <span className="font-black tracking-tight text-lg leading-tight text-obsidian uppercase">
-                  The Daily Grind
-                </span>
-                <span className="text-[11px] font-mono tracking-widest text-obsidian-500 uppercase">
-                  Innovation Hub &bull; Scottsville
-                </span>
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-7 text-sm font-medium text-obsidian-700">
-              <Link href="/coworking" className="hover:text-obsidian hover:underline underline-offset-8 transition-colors">
-                Co-Working Space
-              </Link>
-              <Link href="/codetrepreneurs" className="hover:text-obsidian hover:underline underline-offset-8 transition-colors">
-                Codetrepreneurs
-              </Link>
-              <Link href="/3d-printing" className="hover:text-obsidian hover:underline underline-offset-8 transition-colors">
-                3D Studio
-              </Link>
-              <Link href="/cohorts" className="hover:text-obsidian hover:underline underline-offset-8 transition-colors">
-                Cohorts & Capstones
-              </Link>
-              <Link href="/about" className="hover:text-obsidian hover:underline underline-offset-8 transition-colors">
-                About & Impact
-              </Link>
-              <Link href="/team" className="hover:text-obsidian hover:underline underline-offset-8 transition-colors">
-                Team
-              </Link>
-              <Link href="/contact" className="hover:text-obsidian hover:underline underline-offset-8 transition-colors">
-                Contact & Tickets
-              </Link>
-            </nav>
-
-            {/* CTAs */}
-            <div className="flex items-center gap-3">
-              <Link
-                href="/portal/dashboard"
-                className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-obsidian hover:text-electric-cobalt transition-colors font-mono"
-              >
-                Portal Login
-              </Link>
-              <Link
-                href="/portal/applications/new"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-obsidian text-white text-sm font-semibold hover:bg-electric-cobalt transition-all shadow-tactile hover:shadow-tactile-hover active:translate-y-0.5"
-              >
-                Apply for 2026
-              </Link>
-            </div>
-          </div>
-        </header>
+        {/* Master Navigation Header with 'Who are we' & 'What we do' Hover Menus and Reason-Targeted Apply */}
+        <HeaderNav />
 
         {/* Main Viewport Content */}
         <main className="flex-1">{children}</main>
@@ -164,9 +109,10 @@ export default function RootLayout({
                   Programs & Spaces
                 </h4>
                 <ul className="space-y-2.5 text-sm text-obsidian-400">
+                  <li><Link href="/incubation" className="hover:text-white transition-colors">Business Incubation</Link></li>
+                  <li><Link href="/coworking" className="hover:text-white transition-colors">Co-Working Space</Link></li>
                   <li><Link href="/codetrepreneurs" className="hover:text-white transition-colors">Codetrepreneurs (1-Year)</Link></li>
-                  <li><Link href="/3d-printing" className="hover:text-white transition-colors">3D Printing & FabLab</Link></li>
-                  <li><Link href="/coworking" className="hover:text-white transition-colors">Co-Working Floorplan & Desks</Link></li>
+                  <li><Link href="/3d-printing" className="hover:text-white transition-colors">3D Printing Studio</Link></li>
                   <li><Link href="/cohorts" className="hover:text-white transition-colors">Cohort Capstone Showcase</Link></li>
                   <li><Link href="/portal/applications/new" className="text-electric-blue hover:underline">Apply for 2026 Intake</Link></li>
                 </ul>

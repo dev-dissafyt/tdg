@@ -1,23 +1,33 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { tdghDb } from '@tdgh/db';
 import { Application, ProgramTrack } from '@tdgh/types';
 import { Badge, Button, Input, Textarea } from '@tdgh/ui';
 import { ArrowLeft, CheckCircle, Clock, Upload, ArrowRight, ShieldCheck, FileText } from 'lucide-react';
 
-export default function ApplicationWizardPage() {
+function ApplicationWizardContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const appId = (params?.id as string) || 'new';
 
   const isNew = appId === 'new';
   const existing = !isNew ? tdghDb.getApplicationById(appId) : undefined;
 
+  const getInitialTrack = (): ProgramTrack => {
+    if (existing?.track) return existing.track;
+    const queryTrack = searchParams?.get('track')?.toLowerCase();
+    if (queryTrack === '3d-printing' || queryTrack === 'maker_3d' || queryTrack === '3d') return 'MAKER_3D';
+    if (queryTrack === 'incubation' || queryTrack === 'bms') return 'INCUBATION';
+    if (queryTrack === 'coworking' || queryTrack === 'desk') return 'COWORKING';
+    return 'CODETREPRENEURS';
+  };
+
   const [currentStep, setCurrentStep] = useState(1);
-  const [track, setTrack] = useState<ProgramTrack>(existing?.track || 'CODETREPRENEURS');
+  const [track, setTrack] = useState<ProgramTrack>(getInitialTrack());
   const [formData, setFormData] = useState({
     fullName: existing?.fullName || 'Kaylin Fortuin',
     email: existing?.email || 'kaylin.f@outlook.com',
@@ -222,7 +232,7 @@ export default function ApplicationWizardPage() {
                 Choose the specialized learning or venture pathway you wish to enter.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
                 <button
                   type="button"
                   onClick={() => setTrack('CODETREPRENEURS')}
@@ -283,6 +293,27 @@ export default function ApplicationWizardPage() {
                   </div>
                   <Badge variant={track === 'INCUBATION' ? 'purple' : 'default'} className="mt-4">
                     {track === 'INCUBATION' ? 'Selected' : 'Select'}
+                  </Badge>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setTrack('COWORKING')}
+                  className={`p-5 rounded-2xl border text-left flex flex-col justify-between transition-all ${
+                    track === 'COWORKING'
+                      ? 'border-emerald-600 bg-emerald-50/50 shadow-sm'
+                      : 'border-porcelain-border hover:border-obsidian'
+                  }`}
+                >
+                  <div className="space-y-2">
+                    <span className="text-xs font-mono font-bold text-emerald-600">Flexible</span>
+                    <h4 className="font-bold text-base text-obsidian">Co-Working Desk</h4>
+                    <p className="text-xs text-obsidian-600">
+                      Hot desk or dedicated pod, 1Gbps unshaped fiber, and backup solar power.
+                    </p>
+                  </div>
+                  <Badge variant={track === 'COWORKING' ? 'emerald' : 'default'} className="mt-4">
+                    {track === 'COWORKING' ? 'Selected' : 'Select'}
                   </Badge>
                 </button>
               </div>
@@ -429,5 +460,22 @@ export default function ApplicationWizardPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function ApplicationWizardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen py-24 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 rounded-full border-2 border-electric-cobalt border-t-transparent animate-spin" />
+            <span className="text-sm font-mono text-obsidian-600">Loading admissions wizard...</span>
+          </div>
+        </div>
+      }
+    >
+      <ApplicationWizardContent />
+    </Suspense>
   );
 }
